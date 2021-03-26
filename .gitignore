@@ -1,0 +1,10 @@
+*.swp
+*.pyc
+*.un~
+*~
+*.ftpconfig
+*.autosave
+/t
+client/htdocs/
+client/node_modules/
+client/package-lock.json

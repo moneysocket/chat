@@ -1,0 +1,11 @@
+.background {
+    background: url(../img/horus.png) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.megashadow {
+    filter: drop-shadow(0.75rem 0.985rem 0.6rem rgba(0, 0, 0, 0.4));
+}

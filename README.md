@@ -1,2 +1,2 @@
 # chat
-Moneysocket Chat application
+moneysocket chat app
