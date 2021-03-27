@@ -30,10 +30,14 @@ class AppClient(WebSocketServerProtocol):
     def onOpen(self):
         print("WebSocket client connection open.")
         self.server.clients.append(self)
-        self.sendMessage("hello".encode('utf8'), isBinary=False)
+        for m in self.server.app.chat_db.chat_messages():
+            self.sendMessage(m.encode('utf8'), isBinary=False)
 
     def onMessage(self, payload, isBinary):
         print("message: %s" % payload)
+        self.server.app.chat_db.add_chat_message("tbd", "tbd", "tbd", "tbd",
+                                                 "tbd", "tbd",
+                                                 payload.decode('utf8'))
         self.server.echo_to_clients(payload)
 
     def onClose(self, wasClean, code, reason):
@@ -100,7 +104,7 @@ class ChatApp(object):
 
     def run(self):
         self.setup_websocket()
-        #self.setup_chat_db()
+        self.setup_chat_db()
 
     def stop(self):
         #self.chat_db.unmap_chat_bin()
