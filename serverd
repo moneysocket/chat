@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+# Copyright (c) 2021 Moneysocket Developers
+# Distributed under the MIT software license, see the accompanying
+# file LICENSE or http://www.opensource.org/licenses/mit-license.php
+
+from twisted.internet import reactor
+
+from server.config import read_config
+from server.app import ChatApp
+
+if __name__ == "__main__":
+    config = read_config()
+    a = ChatApp(config)
+    a.run()
+    reactor.addSystemEventTrigger("before", "shutdown", a.stop)
+    reactor.run()

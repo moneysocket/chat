@@ -1,13 +1,9 @@
-#!/usr/bin/env python3
 # Copyright (c) 2021 Moneysocket Developers
 # Distributed under the MIT software license, see the accompanying
 # file LICENSE or http://www.opensource.org/licenses/mit-license.php
 import time
 import sys
 import json
-import argparse
-
-from config import read_config
 
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
@@ -18,6 +14,8 @@ from autobahn.twisted.websocket import WebSocketServerFactory
 from txzmq import ZmqEndpoint, ZmqEndpointType
 from txzmq import ZmqFactory
 from txzmq import ZmqSubConnection
+
+from server.chat_db import ChatDb
 
 
 UNPAID_PRUNE_CHECK = 60
@@ -72,7 +70,7 @@ class AppServer(WebSocketServerFactory):
 
 ###############################################################################
 
-class App(object):
+class ChatApp(object):
     def __init__(self, config):
         self.config = config
         self.chat_db_file = config['Db']['ChatDbFile']
@@ -107,13 +105,3 @@ class App(object):
     def stop(self):
         #self.chat_db.unmap_chat_bin()
         pass
-
-
-###############################################################################
-
-if __name__ == "__main__":
-    config = read_config()
-    a = App(config)
-    a.run()
-    reactor.addSystemEventTrigger("before", "shutdown", a.stop)
-    reactor.run()
