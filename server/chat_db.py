@@ -80,15 +80,14 @@ class ChatDb(object):
 
     ###########################################################################
 
-    def add_chat_message(self, chat_uuid, bolt11, preimage, recv_timestamp,
-                         paid_timestamp, username, message):
-        d = {'chat_uuid':       chat_uuid,
-             'bolt11':          bolt11,
-             'preimage':        preimage,
-             'recv_timestamp':  recv_timestamp,
-             'paid_timestamp':  paid_timestamp,
-             'username':        username,
-             'message':         message}
+    def add_chat_message(self, chat_message):
+        d = {'chat_uuid':       chat_message['chat_uuid'],
+             'bolt11':          chat_message['bolt11'],
+             'preimage':        chat_message['preimage'],
+             'recv_timestamp':  chat_message['recv_timestamp'],
+             'paid_timestamp':  chat_message['paid_timestamp'],
+             'username':        chat_message['username'],
+             'message':         chat_message['message']}
         s = json.dumps(d)
         e = s.encode("utf-8") + b'\0'
         self.append_end(e)

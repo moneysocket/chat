@@ -44,8 +44,10 @@ class ChatSocket {
         }
     }
 
-    sendMessage(msg) {
-        this.ws.send(msg);
+    sendMessage(username, message) {
+        var msg = {'username': username,
+                   'message':  message}
+        this.ws.send(JSON.stringify(msg));
     }
 }
 
