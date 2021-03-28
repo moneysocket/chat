@@ -15,8 +15,7 @@ class ChatView {
     }
 
 
-    timestampString() {
-        var time = (new Date()).getTime() / 1000;
+    timestampString(time) {
         var d = new Date(Math.round(time * 1000));
         var s = d.getDate()+
                 "/"+(d.getMonth()+1)+
@@ -69,12 +68,16 @@ class ChatView {
         // TODO
     }
 
-    drawMessage(username, message) {
-        var t = this.timestampString();
+    drawMessage(timestamp, username, message) {
+        var t = this.timestampString(timestamp);
         var m = document.getElementById("messages");
-
         var s = t + " " + username + " > " + message;
         D.textParagraph(m, s);
+    }
+
+    drawInvoice(bolt11) {
+        var m = document.getElementById("messages");
+        D.textParagraph(m, bolt11);
     }
 
     start() {

@@ -14,13 +14,15 @@ class ChatController {
 
     setupModel() {
         this.model.onchatmessage = (function(message) {
-            this.view.drawMessage("Anonymous", message);
+            this.view.drawMessage(message['paid_timestamp'],
+                                  message['username'],
+                                  message['message']);
         }).bind(this);
         this.model.onchaterror = (function(error) {
             // TODO
         }).bind(this);
-        this.model.onchatinvoice = (function() {
-            // TODO
+        this.model.oninvoice = (function(bolt11) {
+            this.view.drawInvoice(bolt11);
         }).bind(this);
         this.model.onchatconnect = (function() {
             // TODO

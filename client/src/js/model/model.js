@@ -27,8 +27,8 @@ class ChatModel {
         c.ondisconnect = (function() {
             this.chatSocketOnDisconnect();
         }).bind(this);
-        c.oninvoice = (function(invoice) {
-            this.chatSocketOnInvoice(invoice);
+        c.oninvoice = (function(bolt11) {
+            this.chatSocketOnInvoice(bolt11);
         }).bind(this);
         c.onmessages = (function(messages) {
             this.chatSocketOnMessages(messages);
@@ -86,10 +86,10 @@ class ChatModel {
         // TODO try reconnect?
         console.log("disconnected");
     }
-    chatSocketOnInvoice(invoice) {
-        console.log("invoice: " + invoice);
-        if (this.onchatinvoice != null) {
-            this.onchatinvoice(invoice);
+    chatSocketOnInvoice(bolt11) {
+        console.log("invoice: " + bolt11);
+        if (this.oninvoice != null) {
+            this.oninvoice(bolt11);
         }
         // TODO forward to consumer stack to pay
     }

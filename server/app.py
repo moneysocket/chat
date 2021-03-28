@@ -68,8 +68,7 @@ class ChatSocketClient(WebSocketServerProtocol):
         self.client_uuid = uuid.uuid4()
         logging.info("WebSocket client connection open. %s" % self.client_uuid)
         self.server.clients[self.client_uuid] = self
-        for m in self.server.app.chat_db.chat_messages():
-            self.sendMessage(m.encode('utf8'), isBinary=False)
+        self.server.app.send_chat_history(self.client_uuid)
 
     def onMessage(self, payload, isBinary):
         if isBinary:
@@ -114,7 +113,7 @@ class ChatSocketClient(WebSocketServerProtocol):
 
     def send_invoice(self, bolt11):
         i = {'type': "INVOICE",
-             'invoice': bolt11}
+             'bolt11': bolt11}
         self.sendMessage(json.dumps(i).encode('utf8'), isBinary=False)
 
     def send_message(self, message):
@@ -150,6 +149,12 @@ class ChatSocketServer(WebSocketServerFactory):
     def send_to_all_chat_clients(self, message):
         for c in self.clients.values():
             c.send_message(message)
+
+    def send_message(self, client_uuid, message):
+        if client_uuid not in self.clients:
+            logging.info("client disconnected?")
+            return
+        self.clients[client_uuid].send_message(message)
 
     def client_message_request(self, client_uuid, chat_message):
         return self.app.client_message_request(client_uuid, chat_message)
@@ -213,6 +218,11 @@ class ChatApp(object):
         self.pending_requests.add_invoicing(request_uuid, client_uuid,
                                             chat_message)
         return None
+
+    def send_chat_history(self, client_uuid):
+        for m in self.chat_db.chat_messages():
+            print(m)
+            self.chat_socket_server.send_message(client_uuid, json.loads(m))
 
     ###########################################################################
 

@@ -9,7 +9,7 @@ class ChatSocket {
 
         this.onconnect = null;
         this.ondisconnect = null;
-        this.onchatinvoice = null;
+        this.oninvoice = null;
         this.onmessage = null;
         this.onmessages = null;
         this.onerror = null;
@@ -37,10 +37,23 @@ class ChatSocket {
     }
 
     onMessage(event) {
-        var msg = event.data;
-        console.log("got msg off wire: " + msg);
-        if (this.onmessage != null) {
-            this.onmessage(msg);
+        var msg = JSON.parse(event.data);
+        console.log("got msg off wire: " + event.data);
+
+        if (msg['type'] == "MESSAGE") {
+            if (this.onmessage != null) {
+                this.onmessage(msg);
+            }
+        }
+        if (msg['type'] == "INVOICE") {
+            if (this.oninvoice != null) {
+                this.oninvoice(msg['bolt11']);
+            }
+        }
+        if (msg['type'] == "ERROR") {
+            if (this.onerror != null) {
+                this.onerror(msg['error']);
+            }
         }
     }
 

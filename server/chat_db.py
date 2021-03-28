@@ -81,7 +81,8 @@ class ChatDb(object):
     ###########################################################################
 
     def add_chat_message(self, chat_message):
-        d = {'chat_uuid':       chat_message['chat_uuid'],
+        d = {'type':            chat_message['type'],
+             'chat_uuid':       chat_message['chat_uuid'],
              'bolt11':          chat_message['bolt11'],
              'preimage':        chat_message['preimage'],
              'recv_timestamp':  chat_message['recv_timestamp'],
