@@ -144,7 +144,7 @@ class ChatModel {
     //////////////////////////////////////////////////////////////////////////
 
     sendMessage(username, message) {
-        this.chatsocket.sendMessage(message);
+        this.chatsocket.sendMessage(username, message);
     }
 }
 
