@@ -2,6 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php
 
+const MoneysocketBeacon = require('moneysocket').MoneysocketBeacon;
 
 class ChatController {
     constructor(model, view) {
@@ -30,24 +31,57 @@ class ChatController {
         this.model.onchatdisconnect = (function() {
             // TODO
         }).bind(this);
+        this.model.onstackevent = (function(layer_name, event) {
+            console.log("event passing to view");
+            this.view.postStackEvent(layer_name, event);
+        }).bind(this);
+        this.model.onconsumerconnect = (function() {
+            this.view.postConnected();
+        }).bind(this);
+        this.model.onconsumerdisconnect = (function() {
+            this.view.postDisconnected();
+        }).bind(this);
+        this.model.onbalanceupdate = (function(wad) {
+            this.view.postWadBalance(wad);
+        }).bind(this);
     }
 
     setupView() {
         this.view.onchatinput = (function(username, chatmessage) {
             this.onUserChatInput(username, chatmessage);
         }).bind(this);
-        this.view.onbeaconrequest = (function() {
-            this.genConsumerBeacon();
+        this.view.ongenerateselect = (function() {
+            this.connectNewConsumerBeacon();
+        }).bind(this);
+        this.view.onbeaconselect = (function(beacon) {
+            this.connectConsumerBeacon(beacon);
+        }).bind(this);
+        this.view.ondisconnectselect = (function() {
+            this.model.disconnect();
         }).bind(this);
     }
 
     onUserChatInput(username, chatmessage) {
-        // TODO - send to server for invoice
         this.model.sendMessage(username, chatmessage);
     }
 
-    genConsumerBeacon() {
-        // TODO - connect with stack and provide to user
+    connectNewConsumerBeacon() {
+        var beacon_str = this.model.generateNewBeacon();
+        this.view.drawConnectingInterface(beacon_str);
+        this.model.connectToBeacon(beacon_str);
+    }
+
+    connectConsumerBeacon(beacon_str) {
+        var [beacon, err] = MoneysocketBeacon.fromBech32Str(beacon_str);
+        if (err != null) {
+            this.view.postError(err);
+            return;
+        }
+        this.view.drawConnectingInterface(beacon_str);
+        err = this.model.connectToBeacon(beacon_str);
+        if (err != null) {
+            this.view.postError(err);
+        }
     }
 
     start() {
