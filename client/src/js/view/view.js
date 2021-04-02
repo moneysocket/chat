@@ -207,14 +207,18 @@ class ChatView {
     // chat interface
     ///////////////////////////////////////////////////////////////////////////
 
+    pad2(str) {
+        return ("00" + str).slice(-2);
+    }
+
     timestampString(time) {
         var d = new Date(Math.round(time * 1000));
-        var s = d.getDate()+
-                "/"+(d.getMonth()+1)+
-                "/"+ d.getFullYear()+
-                " "+ d.getHours()+
-                ":"+ d.getMinutes()+
-                ":"+ d.getSeconds();
+        var s = this.pad2(d.getDate()) +
+                "/" + this.pad2(d.getMonth()+1) +
+                "/" + d.getFullYear() +
+                " " + this.pad2(d.getHours()) +
+                ":" + this.pad2(d.getMinutes()) +
+                ":" + this.pad2(d.getSeconds());
         return s;
     }
 
@@ -223,7 +227,7 @@ class ChatView {
         var input = document.getElementById("chat-input");
         var flex = D.emptyDiv(input, "flex flex-nowrap justify-start");
 
-        var i = D.emptyDiv(flex, "border border-black");
+        var i = D.emptyDiv(flex, "border border-black break-all");
 
         this.input_div = D.emptyInput(i,
                                       "w-auto rounded border border-gray-800");
@@ -257,30 +261,44 @@ class ChatView {
         }
     }
 
-
-    drawMessage(timestamp, username, message) {
-        var t = this.timestampString(timestamp);
-        var m = document.getElementById("messages");
-        var s = t + " " + username + " > " + message;
-        D.textParagraph(m, s);
-    }
-
-    drawInvoice(bolt11) {
-        var m = document.getElementById("messages");
-        D.textParagraph(m, bolt11);
-    }
-
-    postError(err_msg) {
-        var m = document.getElementById("messages");
-        D.textParagraph(m, err_msg, "text-red-500");
-    }
-
     postWadBalance(wad) {
         if (this.wad_div == null) {
             return;
         }
         D.deleteChildren(this.wad_div);
         D.textParagraph(this.wad_div, wad.toString(), "font-bold");
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // draw events to chat log
+    ///////////////////////////////////////////////////////////////////////////
+
+    postMessage(timestamp, username, message) {
+
+        var m = document.getElementById("messages");
+
+        var obg = D.emptyDiv(m, "py-2 px-2");
+        var bg = D.emptyDiv(obg, "rounded-2xl bg-gray-500 py-2");
+        var flex = D.emptyDiv(bg, "flex flex-col")
+
+        var t = this.timestampString(timestamp);
+        D.textParagraph(flex, username, "pl-4 text-white text-xl font-bold");
+        D.textParagraph(flex, message, "pl-4 text-white");
+
+        var right = D.emptyDiv(flex, "flex justify-end");
+        D.textParagraph(right, t, "pr-4 text-white");
+    }
+
+    postInvoice(bolt11) {
+        var m = document.getElementById("messages");
+
+        var bg = D.emptyDiv(m, "rounded bg-gray-500");
+        D.textParagraph(bg, bolt11, "text-white");
+    }
+
+    postError(err_msg) {
+        var m = document.getElementById("messages");
+        D.textParagraph(m, err_msg, "text-red-500");
     }
 
     ///////////////////////////////////////////////////////////////////////////

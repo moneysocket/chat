@@ -15,7 +15,7 @@ class ChatController {
 
     setupModel() {
         this.model.onchatmessage = (function(message) {
-            this.view.drawMessage(message['paid_timestamp'],
+            this.view.postMessage(message['paid_timestamp'],
                                   message['username'],
                                   message['message']);
         }).bind(this);
@@ -74,7 +74,7 @@ class ChatController {
             return;
         }
         console.log("consumer not connected");
-        this.view.drawInvoice(bolt11);
+        this.view.postInvoice(bolt11);
     }
 
     onUserChatInput(username, chatmessage) {
