@@ -2,6 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php
 
+const Uuid = require("moneysocket").Uuid;
+const Bolt11 = require("moneysocket").Bolt11;
 const MoneysocketBeacon = require('moneysocket').MoneysocketBeacon;
 const WebsocketLocation = require('moneysocket').WebsocketLocation;
 const ConsumerStack = require('moneysocket').ConsumerStack;
@@ -26,10 +28,13 @@ class ChatModel {
         this.consumer_state = CONNECT_STATE.DISCONNECTED;
         this.consumer = this.setupConsumerStack();
 
+        this.chat_state = CONNECT_STATE.DISCONNECTED;
+
         this.provider_info = null;
 
         this.onchatmessage = null;
         this.onchaterror = null;
+        this.onchatservererror = null;
         this.onchatinvoice = null;
         this.onchatconnect = null;
         this.onchatdisconnect = null;
@@ -37,6 +42,9 @@ class ChatModel {
         this.onconsumerdisconnect = null;
         this.onconsumerconnect = null;
         this.onbalanceupdate = null;
+        this.onconsumererror = null;
+
+        this.pay_requests = {};
     }
 
     setupChatSocket() {
@@ -54,11 +62,13 @@ class ChatModel {
             this.chatSocketOnMessages(messages);
         }).bind(this);
         c.onmessage = (function(message) {
-            console.log("model got msag");
             this.chatSocketOnMessage(message);
         }).bind(this);
         c.onerror = (function(error) {
             this.chatSocketOnError(error);
+        }).bind(this);
+        c.onservererror = (function(error) {
+            this.chatSocketOnServerError(error);
         }).bind(this);
         return c;
     }
@@ -97,14 +107,17 @@ class ChatModel {
     //////////////////////////////////////////////////////////////////////////
 
     chatSocketOnConnect() {
-        console.log("connected");
-        this.consumer_state = CONNECT_STATE.CONNECTED;
+        console.log("chat socket connected");
+        this.chat_state = CONNECT_STATE.CONNECTED;
     }
 
     chatSocketOnDisconnect() {
         // TODO try reconnect?
-        console.log("disconnected");
-        this.consumer_state = CONNECT_STATE.DISCONNECTED;
+        console.log("chat socket disconnected");
+        this.chat_state = CONNECT_STATE.DISCONNECTED;
+        if (this.onchatdisconnect != null) {
+            this.onchatdisconnect();
+        }
     }
 
     chatSocketOnInvoice(bolt11) {
@@ -112,7 +125,6 @@ class ChatModel {
         if (this.oninvoice != null) {
             this.oninvoice(bolt11);
         }
-        // TODO forward to consumer stack to pay
     }
 
     chatSocketOnMessage(message) {
@@ -128,8 +140,15 @@ class ChatModel {
 
     chatSocketOnError(error) {
         console.log("error: " + error);
-        if (this.onerror != null) {
-            this.onerror(error);
+        if (this.onchaterror != null) {
+            this.onchaterror(error);
+        }
+    }
+
+    chatSocketOnServerError(error) {
+        console.log("server error: " + error);
+        if (this.onchatservererror != null) {
+            this.onchatservererror(error);
         }
     }
 
@@ -139,6 +158,7 @@ class ChatModel {
 
     consumerOnAnnounce(nexus) {
         console.log("consumer announce");
+        this.consumer_state = CONNECT_STATE.CONNECTED;
         if (this.onconsumerconnect != null) {
             this.onconsumerconnect();
         }
@@ -146,6 +166,7 @@ class ChatModel {
 
     consumerOnRevoke(nexus) {
         console.log("consumer revoke");
+        this.consumer_state = CONNECT_STATE.DISCONNECTED;
         if (this.onconsumerdisconnect != null) {
             this.onconsumerdisconnect();
         }
@@ -169,11 +190,18 @@ class ChatModel {
     }
 
     consumerOnInvoice(bolt11, request_reference_uuid) {
-        console.log("invoice");
+        console.log("invoice?: " + invoice);
     }
 
     consumerOnPreimage(preimage, request_reference_uuid) {
-        console.log("preimage");
+        var payment_hash = Bolt11.preimageToPaymentHash(preimage);
+        if (payment_hash in this.pay_requests) {
+            var request = this.pay_requests[payment_hash];
+            delete this.pay_requests[payment_hash];
+            console.log("invoice is paid: " + request['bolt11']);
+        } else {
+            console.log("got unknown preimage: " + preimage);
+        }
     }
 
     consumerOnError(error_msg, request_reference_uuid) {
@@ -181,11 +209,32 @@ class ChatModel {
     }
 
     //////////////////////////////////////////////////////////////////////////
-    // calls in
+    // message calls in
     //////////////////////////////////////////////////////////////////////////
 
     sendMessage(username, message) {
         this.chatsocket.sendMessage(username, message);
+    }
+
+    chatSocketIsConnected() {
+        return this.chat_state == CONNECT_STATE.CONNECTED;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    // consumer calls in
+    //////////////////////////////////////////////////////////////////////////
+
+    payInvoice(bolt11) {
+        var request_uuid = Uuid.uuidv4();
+        this.consumer.requestPay(bolt11, request_uuid);
+
+        var payment_hash = Bolt11.getPaymentHash(bolt11);
+        this.pay_requests[payment_hash] = {'request_uuid': request_uuid,
+                                           'bolt11':       bolt11};
+    }
+
+    consumerIsConnected() {
+        return this.consumer_state == CONNECT_STATE.CONNECTED;
     }
 
     generateNewBeacon() {

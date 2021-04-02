@@ -270,9 +270,9 @@ class ChatView {
         D.textParagraph(m, bolt11);
     }
 
-    postError(err) {
+    postError(err_msg) {
         var m = document.getElementById("messages");
-        D.textParagraph(m, err, "text-red");
+        D.textParagraph(m, err_msg, "text-red-500");
     }
 
     postWadBalance(wad) {

@@ -20,16 +20,19 @@ class ChatController {
                                   message['message']);
         }).bind(this);
         this.model.onchaterror = (function(error) {
-            // TODO
+            this.view.postError("chat socket error");
+        }).bind(this);
+        this.model.onchatservererror = (function(error) {
+            this.view.postError(error);
         }).bind(this);
         this.model.oninvoice = (function(bolt11) {
-            this.view.drawInvoice(bolt11);
+            this.onInvoice(bolt11);
         }).bind(this);
         this.model.onchatconnect = (function() {
-            // TODO
+            this.view.postConnected();
         }).bind(this);
         this.model.onchatdisconnect = (function() {
-            // TODO
+            this.view.postError("disconnected from server");
         }).bind(this);
         this.model.onstackevent = (function(layer_name, event) {
             console.log("event passing to view");
@@ -43,6 +46,9 @@ class ChatController {
         }).bind(this);
         this.model.onbalanceupdate = (function(wad) {
             this.view.postWadBalance(wad);
+        }).bind(this);
+        this.model.onconsumererror = (function(error) {
+            this.view.postError(error);
         }).bind(this);
     }
 
@@ -61,8 +67,22 @@ class ChatController {
         }).bind(this);
     }
 
+    onInvoice(bolt11) {
+        if (this.model.consumerIsConnected()) {
+            console.log("consumer is connected");
+            this.model.payInvoice(bolt11);
+            return;
+        }
+        console.log("consumer not connected");
+        this.view.drawInvoice(bolt11);
+    }
+
     onUserChatInput(username, chatmessage) {
-        this.model.sendMessage(username, chatmessage);
+        if (this.model.chatSocketIsConnected()) {
+            this.model.sendMessage(username, chatmessage);
+            return;
+        }
+        this.view.postError("not connected to server");
     }
 
     connectNewConsumerBeacon() {
