@@ -346,7 +346,7 @@ class ChatView {
         var qr = Kjua({
             ecLevel:   "M",
             render:    "canvas",
-            size:      250,
+            size:      220,
             text:      bolt11,
             mSize:     6,
             fontname:  "sans",
