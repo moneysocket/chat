@@ -2,6 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file LICENSE or http://www.opensource.org/licenses/mit-license.php
 
+const Crypto = require('crypto');
 const Kjua = require('kjua');
 const D = require("./dom.js").DomUtl;
 const ConnectProgress = require("./connect-progress.js").ConnectProgress;
@@ -195,6 +196,7 @@ class ChatView {
     }
 
     postDisconnected() {
+        console.log("DISCONNECT");
         this.wad_div = null;
         this.drawConnectInterface();
     }
@@ -273,20 +275,53 @@ class ChatView {
     // draw events to chat log
     ///////////////////////////////////////////////////////////////////////////
 
+    unpack(str) {
+        var bytes = [];
+        for(var i = 0; i < str.length; i++) {
+            var char = str.charCodeAt(i);
+            bytes.push(char >>> 8);
+            bytes.push(char & 0xFF);
+        }
+        return bytes;
+    }
+
+    sha256(input_bytes) {
+        const hash = Crypto.createHash('sha256');
+        hash.update(input_bytes);
+        return hash.digest();
+    }
+
+    usernameMap(username) {
+        var hash = this.sha256(this.unpack(username));
+        var v1 = hash[0] / 256.0;
+        var v2 = hash[1] / 256.0;
+        var v3 = hash[2] / 256.0;
+        return [v1, v2, v3];
+    }
+
+    usernameColor(username) {
+        var [v1, v2, v3] = this.usernameMap(username);
+        return 'rgb(' + (Math.floor((256-100)*v1) + 101) + ',' +
+                        (Math.floor((256-100)*v2) + 101) + ',' +
+                        (Math.floor((256-100)*v3) + 101) + ')'
+    }
+
     postMessage(timestamp, username, message) {
 
         var m = document.getElementById("messages");
 
-        var obg = D.emptyDiv(m, "py-2 px-2");
-        var bg = D.emptyDiv(obg, "rounded-2xl bg-gray-500 py-2");
+        var obg = D.emptyDiv(m, "py-1 px-2");
+        var bg = D.emptyDiv(obg, "shadow-lg rounded-2xl bg-gray-800 py-2");
         var flex = D.emptyDiv(bg, "flex flex-col")
 
         var t = this.timestampString(timestamp);
-        D.textParagraph(flex, username, "pl-4 text-white text-xl font-bold");
+        var un = D.textParagraph(flex, username, "pl-4 text-l font-bold");
+        un.setAttribute("style", "color:" + this.usernameColor(username));
+
         D.textParagraph(flex, message, "pl-4 text-white");
 
         var right = D.emptyDiv(flex, "flex justify-end");
-        D.textParagraph(right, t, "pr-4 text-white");
+        D.textParagraph(right, t, "pr-4 text-sm text-white");
     }
 
     postInvoice(bolt11) {
