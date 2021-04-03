@@ -307,11 +307,16 @@ class ChatView {
     }
 
     postMessage(timestamp, username, message) {
-
         var m = document.getElementById("messages");
 
-        var obg = D.emptyDiv(m, "py-1 px-2");
-        var bg = D.emptyDiv(obg, "shadow-lg rounded-2xl bg-gray-800 py-2");
+        var our_username = "Anonymous";
+        var justify = (username == our_username) ? "justify-end" :
+                                                   "justify-start";
+        var bg_color = (username == our_username) ? "bg-gray-600" :
+                                                    "bg-gray-800";
+        var obg = D.emptyDiv(m, "flex " + justify + " py-1 px-2");
+        var bg = D.emptyDiv(obg,
+            "shadow-lg rounded-2xl " + bg_color + " w-5/6 py-2");
         var flex = D.emptyDiv(bg, "flex flex-col")
 
         var t = this.timestampString(timestamp);
