@@ -64,6 +64,7 @@ class ChatController {
         }).bind(this);
         this.view.ondisconnectselect = (function() {
             this.model.disconnect();
+            this.view.postDisconnected();
         }).bind(this);
     }
 
