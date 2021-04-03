@@ -17,7 +17,8 @@ class ChatController {
         this.model.onchatmessage = (function(message) {
             this.view.postMessage(message['paid_timestamp'],
                                   message['username'],
-                                  message['message']);
+                                  message['message'],
+                                  message['preimage']);
         }).bind(this);
         this.model.onchaterror = (function(error) {
             this.view.postError("chat socket error");

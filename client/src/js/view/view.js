@@ -5,6 +5,7 @@
 const Crypto = require('crypto');
 const Kjua = require('kjua');
 const D = require("./dom.js").DomUtl;
+const Bolt11 = require("moneysocket").Bolt11;
 const ConnectProgress = require("./connect-progress.js").ConnectProgress;
 const Copy = require('clipboard-copy');
 
@@ -306,7 +307,7 @@ class ChatView {
                         (Math.floor((256-100)*v3) + 101) + ')'
     }
 
-    postMessage(timestamp, username, message) {
+    postMessage(timestamp, username, message, preimage) {
         var m = document.getElementById("messages");
 
         var our_username = "Anonymous";
@@ -327,13 +328,50 @@ class ChatView {
 
         var right = D.emptyDiv(flex, "flex justify-end");
         D.textParagraph(right, t, "pr-4 text-sm text-white");
+
+        if (preimage == null) {
+            return;
+        }
+        var payment_hash = Bolt11.preimageToPaymentHash(preimage);
+        var d = document.getElementById(payment_hash);
+        if (d == null) {
+            return;
+        }
+        D.deleteChildren(d);
+    }
+
+    drawBolt11Qr(div, bolt11) {
+        bolt11 = bolt11.toUpperCase();
+
+        var qr = Kjua({
+            ecLevel:   "M",
+            render:    "canvas",
+            size:      250,
+            text:      bolt11,
+            mSize:     6,
+            fontname:  "sans",
+            fontcolor: "#3B5323",
+            quiet:     0,
+        });
+        var b = D.emptyDiv(div, "py-2");
+        var c = D.emptyDiv(b, "border-8 border-white");
+        c.appendChild(qr);
     }
 
     postInvoice(bolt11) {
+        var payment_hash = Bolt11.getPaymentHash(bolt11);
         var m = document.getElementById("messages");
 
-        var bg = D.emptyDiv(m, "rounded bg-gray-500");
-        D.textParagraph(bg, bolt11, "text-white");
+        var bg = D.emptyDiv(m, "rounded-2xl bg-green-500 w-5/6");
+        bg.setAttribute("id", payment_hash);
+        var flex = D.emptyDiv(bg, "flex flex-col")
+        var un = D.textParagraph(flex, "(only visible to you)",
+                                 "pl-4 text-l font-bold");
+        var frow = D.emptyDiv(bg, "flex justify-around")
+        var t = D.emptyDiv(frow, "flex flex-col w-60");
+        D.textParagraph(t, "It would be better if you had a Moneysocket wallet connected. You can pay manually, if you want, though:", "text-center");
+        D.textParagraph(t, bolt11, "text-xs text-white break-words");
+        this.drawBolt11Qr(frow, bolt11);
     }
 
     postError(err_msg) {
