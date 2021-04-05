@@ -32,7 +32,7 @@ const IDENTITY_PRESETS = ['- choose preset -',
                           'HumanResources',
                           'Trans',
                           'Straight',
-                          'LGBTQAI2S+',
+                          'LGBTQAI2S',
                           'SuperStraight',
                           'Jihadi',
                           'Hippie',
@@ -144,8 +144,9 @@ class ChatView {
         var paste = D.emptyDiv(flex,
                                "flex justify-center items-center " +
                                "border border-gray-800 py-2 m-2 rounded-2xl");
-        this.paste_input_div = D.emptyInput(paste, "w-auto rounded");
+        this.paste_input_div = D.emptyInput(paste, "w-auto rounded px-2");
         this.paste_input_div.setAttribute("placeholder", "Paste Beacon Here");
+        this.paste_input_div.setAttribute("size", "15");
         this.drawPasteButton(paste,
                              (function() {this.pasteResult()}).bind(this));
         var buttons = D.emptyDiv(flex, "flex justify-around py-4");
@@ -273,6 +274,7 @@ class ChatView {
 
     drawChatInput() {
         var input = document.getElementById("chat-input");
+        /*
         var flex = D.emptyDiv(input, "flex flex-nowrap justify-start");
 
         var i = D.emptyDiv(flex, "border border-black break-all");
@@ -292,6 +294,7 @@ class ChatView {
             "border border-black rounded px-2 py-2 bg-blue");
         var flex = D.emptyDiv(b, "flex items-center justify-around");
         var text = D.textSpan(flex, "send", "");
+        */
     }
 
 
@@ -447,6 +450,10 @@ class ChatView {
         var u = document.getElementById("current-identity");
         D.deleteChildren(u);
         D.textSpan(u, this.username);
+        if (this.custom_identity == null) {
+            return;
+        }
+        this.custom_identity.value = "";
     }
 
     setCustomUsername() {
@@ -455,7 +462,6 @@ class ChatView {
             return;
         }
         this.setUsername(username);
-        this.custom_identity.value = "";
     }
 
     selectIdentity() {
