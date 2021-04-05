@@ -9,3 +9,18 @@
 .megashadow {
     filter: drop-shadow(0.75rem 0.985rem 0.6rem rgba(0, 0, 0, 0.2));
 }
+
+
+.bannerheight {
+    height: 13%;
+}
+.fillheight {
+    height: 2%;
+}
+.chatheight {
+    height: 65%;
+}
+
+.inputheight {
+    height: 20%;
+}

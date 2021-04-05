@@ -16,32 +16,33 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
 <div class="flex flex-col h-screen">
 
 <!-- top banner col entry-->
-<div class="flex-none">
-    <div class="flex justify-start items-center">
-    <div class="w-1/6"> <img class="w-auto px-2 py-2 megashadow" alt="Moneysocket Chat" src="img/eye.png"> </a> </div>
-    <div class="w-5/6"> <img class="w-auto px-10 py-10 megashadow" alt="Moneysocket Chat" src="img/title.png"> </div>
-    </div>
+<div class="bannerheight">
+    <img class="h-full px-2 py-2 megashadow" alt="Moneysocket Chat" src="img/banner.png"> </a>
 </div>
 
-
+<div class="fillheight"> </div>
 <!-- messages
 <-->
-<div class="flex-grow overflow-auto">
-    <div class="border border-black rounded w-full px-2"> <div class="bg-transparent"> <div id="messages" class=""></div> </div> </div>
+<div class="chatheight">
+    <div class="flex justify-start h-full">
+        <div id="messages" class="h-full overflow-auto border border-black rounded bg-transparent w-full px-2"> </div>
+        <div class="w-240px px-2"> <div class="border border-black bg-transparent rounded"> <div class=""> <div id="connect-interface"> </div> </div> </div> </div>
+    </div>
 </div>
 <!-- connect interface-->
 
+<!--
 <div class="flex-none">
-    <div class="w-240px px-2"> <div class="border border-black bg-transparent rounded"> <div class=""> <div id="connect-interface"> </div> </div> </div> </div>
 </div>
 
 <div class="flex-none">
     <div class="w-240px px-2"> <div class="border border-black bg-transparent rounded"> <div id="identity-interface">hello</div> </div> </div>
 </div>
+-->
 
 
 <!-- chat input -->
-<div class="flex-none">
+<div class=inputheight">
     <div class="border border-black">
     <div class="h-1/6 px-10"> Chat here: <div id="chat-input"> </div> </div>
     </div>
