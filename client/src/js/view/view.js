@@ -9,6 +9,46 @@ const Bolt11 = require("moneysocket").Bolt11;
 const ConnectProgress = require("./connect-progress.js").ConnectProgress;
 const Copy = require('clipboard-copy');
 
+
+const IDENTITY_PRESETS = ['- choose preset -',
+                          'Anonymous',
+                          'QAnon',
+                          'BBQAnon',
+                          'BlueAnon',
+                          'Woke',
+                          'Obama',
+                          'Trump',
+                          'Biden',
+                          'Hillary',
+                          'Liberal',
+                          'ClassicalLiberal',
+                          'Fashy',
+                          'Commie',
+                          'Capitalist',
+                          'Anarchist',
+                          'Libertarian',
+                          'Programmer',
+                          'Manager',
+                          'HumanResources',
+                          'Trans',
+                          'Straight',
+                          'LGBTQAI2S+',
+                          'SuperStraight',
+                          'Jihadi',
+                          'Hippie',
+                          'Eurotrash',
+                          'Kvlt',
+                          'Furry',
+                          'Emo',
+                          'Goth',
+                          'Ginger',
+                          'Juggalo',
+                          'Pepe',
+                          'Groyper',
+                          'Shitcoin',
+                         ];
+
+
 class ChatView {
     constructor(model) {
         this.model = model;
@@ -23,6 +63,11 @@ class ChatView {
         this.connect_progress = new ConnectProgress(d);
 
         this.displayed_beacon = null;
+
+        this.select_identity = null;
+        this.custom_identity = null;
+        this.set_identity = null;
+        this.username = "Anonymous";
 
         this.onchatinput = null;
         this.onbeaconselect = null;
@@ -260,7 +305,7 @@ class ChatView {
         this.input_div.value = "";
 
         if (this.onchatinput != null) {
-            this.onchatinput("Anonymous", msg);
+            this.onchatinput(this.username, msg);
         }
     }
 
@@ -310,10 +355,9 @@ class ChatView {
     postMessage(timestamp, username, message, preimage) {
         var m = document.getElementById("messages");
 
-        var our_username = "Anonymous";
-        var justify = (username == our_username) ? "justify-end" :
+        var justify = (username == this.username) ? "justify-end" :
                                                    "justify-start";
-        var bg_color = (username == our_username) ? "bg-gray-600" :
+        var bg_color = (username == this.username) ? "bg-gray-600" :
                                                     "bg-gray-800";
         var obg = D.emptyDiv(m, "flex " + justify + " py-1 px-2");
         var bg = D.emptyDiv(obg,
@@ -391,14 +435,64 @@ class ChatView {
         msgDiv.scrollTop = msgDiv.scrollHeight;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // indentity
+    ///////////////////////////////////////////////////////////////////////////
+
+    setUsername(username_string) {
+        var username = username_string.replace(/\W/g, '')
+        username = username.slice(0, 20);
+        this.username = username;
+        var u = document.getElementById("current-identity");
+        D.deleteChildren(u);
+        D.textSpan(u, this.username);
+    }
+
+    setCustomUsername() {
+        var username = this.custom_identity.value;
+        if (username == "") {
+            return;
+        }
+        this.setUsername(username);
+        this.custom_identity.value = "";
+    }
+
+    selectIdentity() {
+        if (this.select_identity == null) {
+            return;
+        }
+        if (this.select_identity.value == null) {
+            return;
+        }
+        if (this.select_identity.value == "") {
+            return;
+        }
+        var selected = this.select_identity.value;
+        console.log("selected: " + selected);
+        this.setUsername(selected);
+    }
+
+    setupIdentity() {
+        var i = document.getElementById("select-identity");
+        this.select_identity = D.dropDownSelect(i, IDENTITY_PRESETS,
+            (function() {this.selectIdentity()}).bind(this), "");
+
+        this.custom_identity = document.getElementById("custom-identity");
+        this.set_identity = document.getElementById("set-identity");
+        this.set_identity.onclick = (function() {
+            this.setCustomUsername();
+        }).bind(this);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // draw
     ///////////////////////////////////////////////////////////////////////////
 
     start() {
+        this.setUsername("Anonymous");
         this.drawChatInput();
         this.drawConnectInterface();
+        this.setupIdentity();
     }
 }
 

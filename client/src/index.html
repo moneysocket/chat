@@ -28,7 +28,7 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
     <!-- side-by-side -->
     <div class="flex justify-start h-full">
         <!-- message scroll -->
-        <div id="messages" class="h-full overflow-auto border border-black rounded bg-transparent w-full px-2"> </div>
+        <div id="messages" class="h-full overflow-auto border border-black border-2 rounded bg-transparent w-full px-2"> </div>
 
         <!-- side setup interfaces -->
         <div class="flex flex-col px-2">
@@ -42,8 +42,6 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
             <div class="py-5">
             <div class="w-full border border-black bg-transparent rounded " id="connect-interface"> </div>
             </div>
-            <!-- connect interface -->
-            <div class="w-full border border-black bg-transparent rounded" id="indentity-interface"> hello </div>
         </div>
 
     </div>
@@ -51,8 +49,23 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
 
 <!-- chat input -->
 <div class=inputheight">
-    <div class="border border-black">
-    <div class="h-1/6 px-10"> Chat here: <div id="chat-input"> </div> </div>
+    <!-- row -->
+    <div class="flex justify-start h-full">
+        <!-- identity column -->
+        <div class="flex flex-col border border-black rounded h-full px-5 py-5">
+            <div class="text-center">I identify as:</div>
+            <div class="text-center font-bold" id="current-identity"></div>
+            <div class="h-6"></div>
+            <div class="flex justify-center">
+                <div id="select-identity"> </div>
+            </div>
+            <div class="flex justify-center border border-black">
+            <input type="text" id="custom-identity" placeholder="custom" size="12" maxlength=20>
+            <button class="border border-black px-2 py-2" id="set-identity">Set</button>
+            </div>
+        </div>
+        <!-- chat typing -->
+        <div id="chat-input"> </div> </div>
     </div>
 </div>
 
