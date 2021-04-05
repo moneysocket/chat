@@ -12,27 +12,34 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
 <link href="css/style.css" rel="stylesheet">
 </head>
 <body class="background">
+<!-- body colum -->
+<div class="flex flex-col">
 
+<!-- top banner col entry-->
 <div class="flex justify-start items-center">
-
 <div class="w-1/6"> <img class="w-auto  px-2 py-2 megashadow" alt="Moneysocket Chat" src="img/eye.png"> </a> </div>
-
 <div class="w-5/6"> <img class="w-auto px-10 py-10 megashadow" alt="Moneysocket Chat" src="img/title.png"> </div>
-
 </div>
 
-<div class="flex flex-col max-h-screen px-2 pt-10">
-<div class="flex-grow">
+
+<!-- center stuff col entry-->
+<div class="flex-grow px-2 pt-10">
+<!-- row in col-->
 <div class="flex justify-start">
+
+<!-- row entry 1 messages-->
 <div class="border border-black rounded w-full px-2"> <div class="h-full bg-transparent"> <div id="messages"></div> </div> </div>
+<!-- row entry 2 connect interface-->
 <div class="w-240px px-2"> <div class="border border-black bg-transparent rounded"> <div class=""> <div id="connect-interface"> </div> </div> </div> </div>
+
+<!-- /row in col-->
 </div>
-</div>
+
+<!-- chat input -->
 <div class="flex-none px-10"> Chat here: <div id="chat-input"> </div> </div>
+
+<!-- /body -->
 </div>
-
-<div id="app"> </div>
-
 </body>
 <script type="module" src="js/app.js"></script>
 </html>
