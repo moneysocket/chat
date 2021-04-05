@@ -357,7 +357,7 @@ class ChatView {
 
         var justify = (username == this.username) ? "justify-end" :
                                                    "justify-start";
-        var bg_color = (username == this.username) ? "bg-gray-600" :
+        var bg_color = (username == this.username) ? "bg-blue-800" :
                                                     "bg-gray-800";
         var obg = D.emptyDiv(m, "flex " + justify + " py-1 px-2");
         var bg = D.emptyDiv(obg,
@@ -408,10 +408,11 @@ class ChatView {
         var payment_hash = Bolt11.getPaymentHash(bolt11);
         var m = document.getElementById("messages");
 
-        var bg = D.emptyDiv(m, "rounded-2xl bg-green-500 w-5/6");
+        var jflex = D.emptyDiv(m, "flex justify-end");
+        var bg = D.emptyDiv(jflex, "rounded-2xl bg-green-500 w-5/6");
         bg.setAttribute("id", payment_hash);
-        var flex = D.emptyDiv(bg, "flex flex-col")
-        var un = D.textParagraph(flex, "(only visible to you)",
+        var cflex = D.emptyDiv(bg, "flex flex-col")
+        var un = D.textParagraph(cflex, "(only visible to you)",
                                  "pl-4 text-l font-bold");
         var frow = D.emptyDiv(bg, "flex justify-around")
         var t = D.emptyDiv(frow, "flex flex-col w-60");
