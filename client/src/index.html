@@ -20,26 +20,34 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
     <img class="h-full px-2 py-2 megashadow" alt="Moneysocket Chat" src="img/banner.png"> </a>
 </div>
 
+<!-- space -->
+
 <div class="fillheight"> </div>
-<!-- messages
-<-->
+<!-- chat output -->
 <div class="chatheight">
+    <!-- side-by-side -->
     <div class="flex justify-start h-full">
+        <!-- message scroll -->
         <div id="messages" class="h-full overflow-auto border border-black rounded bg-transparent w-full px-2"> </div>
-        <div class="w-240px px-2"> <div class="border border-black bg-transparent rounded"> <div class=""> <div id="connect-interface"> </div> </div> </div> </div>
+
+        <!-- side setup interfaces -->
+        <div class="flex flex-col px-2">
+            <!-- description interface -->
+            <div class="flex justify-center"><div class="px-2 py-2 w-60 text-center"> Each chat message costs 1 Satoshi. Payment can be automated by connecting a Moneysocket wallet. </div> </div>
+
+            <!-- tutorial link interface -->
+            <div class="px-2 py-2 font-bold text-3xl text-green-700 text-center"> <a href="https://socket.money">Tutorial</a></div>
+
+            <!-- connect interface -->
+            <div class="py-5">
+            <div class="w-full border border-black bg-transparent rounded " id="connect-interface"> </div>
+            </div>
+            <!-- connect interface -->
+            <div class="w-full border border-black bg-transparent rounded" id="indentity-interface"> hello </div>
+        </div>
+
     </div>
 </div>
-<!-- connect interface-->
-
-<!--
-<div class="flex-none">
-</div>
-
-<div class="flex-none">
-    <div class="w-240px px-2"> <div class="border border-black bg-transparent rounded"> <div id="identity-interface">hello</div> </div> </div>
-</div>
--->
-
 
 <!-- chat input -->
 <div class=inputheight">

@@ -328,6 +328,7 @@ class ChatView {
 
         var right = D.emptyDiv(flex, "flex justify-end");
         D.textParagraph(right, t, "pr-4 text-sm text-white");
+        this.scrollBottom(m);
 
         if (preimage == null) {
             return;
@@ -338,6 +339,7 @@ class ChatView {
             return;
         }
         D.deleteChildren(d);
+        this.scrollBottom(m);
     }
 
     drawBolt11Qr(div, bolt11) {
@@ -372,12 +374,23 @@ class ChatView {
         D.textParagraph(t, "It would be better if you had a Moneysocket wallet connected. You can pay manually, if you want, though:", "text-center");
         D.textParagraph(t, bolt11, "text-xs text-white break-words");
         this.drawBolt11Qr(frow, bolt11);
+        this.scrollBottom(m);
     }
 
     postError(err_msg) {
         var m = document.getElementById("messages");
         D.textParagraph(m, err_msg, "text-red-500");
+        this.scrollBottom(m);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // manage scroll
+    ///////////////////////////////////////////////////////////////////////////
+
+    scrollBottom(msgDiv) {
+        msgDiv.scrollTop = msgDiv.scrollHeight;
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // draw
