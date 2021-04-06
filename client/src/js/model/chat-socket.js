@@ -39,7 +39,6 @@ class ChatSocket {
 
     onMessage(event) {
         var msg = JSON.parse(event.data);
-        console.log("got msg off wire: " + event.data);
 
         if (msg['type'] == "MESSAGE") {
             if (this.onmessage != null) {

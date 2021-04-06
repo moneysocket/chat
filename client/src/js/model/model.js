@@ -128,7 +128,6 @@ class ChatModel {
     }
 
     chatSocketOnMessage(message) {
-        console.log("message: " + message);
         if (this.onchatmessage != null) {
             this.onchatmessage(message);
         }
