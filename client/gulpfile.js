@@ -31,6 +31,7 @@ gulp.task('copyMisc', function copyMisc(cb) {
     gulp.src('src/img/*').pipe(gulp.dest('htdocs/img'));
     gulp.src('src/favicon/*').pipe(gulp.dest('htdocs/favicon'));
     gulp.src('src/css/*').pipe(gulp.dest('htdocs/css'));
+    gulp.src('src/favicon.ico').pipe(gulp.dest('htdocs'));
     cb();
 });
 
