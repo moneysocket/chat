@@ -18,7 +18,11 @@
     height: 2%;
 }
 .chatheight {
-    height: 65%;
+    height: 85%;
+}
+
+.messageheight {
+    height: 80%;
 }
 .inputheight {
     height: 20%;

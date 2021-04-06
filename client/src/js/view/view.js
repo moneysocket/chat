@@ -59,7 +59,7 @@ class ChatView {
         this.wad_div = null;
 
         var d = document.createElement("div");
-        D.setClass(d, "flex justify-center font-black text-2xl text-gray-300");
+        D.setClass(d, "flex justify-center font-black text text-gray-300");
         this.connect_progress = new ConnectProgress(d);
 
         this.displayed_beacon = null;
@@ -161,12 +161,12 @@ class ChatView {
 
     drawDisconnectButton(div, disconnect_func) {
         this.drawButton(div, "Disconnect", disconnect_func,
-                        "px-2 py-2 border border-gray-800 rounded");
+                        "px-2 py-1 border border-gray-800 rounded");
     }
 
     drawCopyBeaconButton(div, copy_func) {
         var b = this.drawButton(div, "Copy", copy_func,
-                                "px-2 py-2 border border-gray-800 rounded");
+                                "px-2 py-1 border border-gray-800 rounded");
         this.copy_span = b.inner_text_span;
     }
 
@@ -183,7 +183,7 @@ class ChatView {
         var qr = Kjua({
             ecLevel:   "M",
             render:    "canvas",
-            size:      360,
+            size:      220,
             text:      beacon,
             label:     "connect wallet",
             mode:      "label",
@@ -207,11 +207,11 @@ class ChatView {
         var q = D.emptyDiv(flex, "flex justify-center");
         this.drawQr(q, beacon);
 
-        var p = D.emptyDiv(flex, "py-4");
+        var p = D.emptyDiv(flex, "py-1");
         p.appendChild(this.connect_progress.parent_div);
         this.connect_progress.draw("DISCONNECTED");
 
-        var buttons = D.emptyDiv(flex, "flex justify-around py-4");
+        var buttons = D.emptyDiv(flex, "flex justify-around py-1");
         this.drawDisconnectButton(buttons,
                              (function() {this.doDisconnect()}).bind(this));
         this.drawCopyBeaconButton(buttons,

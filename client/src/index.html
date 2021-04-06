@@ -24,14 +24,33 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
 
 <div class="fillheight"> </div>
 <!-- chat output -->
-<div class="chatheight">
+<div class="chatheight w-full">
     <!-- side-by-side -->
-    <div class="flex justify-start h-full">
-        <!-- message scroll -->
-        <div id="messages" class="h-full overflow-auto border border-black border-2 rounded bg-transparent w-full px-2"> </div>
+    <div class="flex justify-start h-full w-full">
+        <!-- chat zone -->
+        <div class="h-full w-full px-1">
+            <div id="messages" class="messageheight overflow-auto border border-black border-2 rounded-md bg-transparent w-full h-full px-2 py-2"> </div>
+
+        <!-- chat input -->
+        <div class="inputheight py-2">
+            <!-- row -->
+            <div class="flex justify-start h-full w-full">
+                <!-- chat typing -->
+                <div class="flex justify-around h-full w-full border border-black rounded-md py-2 pl-2">
+                <textarea class="h-full w-5/6 bg-gray-200" id="input-message" style="resize:none;" placeholder="type message..." maxlength=1000></textarea>
+                <div class="px-2 w-1/6">
+                    <button class="border border-black rounded hover:bg-gray-200 h-full w-full px-2 py-2 font-bold text-xl break-all" id="send-message">Send</button>
+                </div>
+                </div>
+
+
+            </div>
+        </div>
+        <!-- /chat zone -->
+        </div>
 
         <!-- side setup interfaces -->
-        <div class="flex flex-col px-2">
+        <div class="flex flex-col justify-around px-2">
             <!-- introduction interface -->
             <div class="border border-black rounded">
             <div class="flex justify-center"><div class="px-2 py-2 w-60 text-center"> Each chat message costs 1 Satoshi to post. Payment can be automated by connecting a Moneysocket wallet. </div> </div>
@@ -41,23 +60,27 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
 
             <!-- connect interface -->
             <div class="py-5">
-            <div class="w-full border border-black bg-transparent rounded " id="connect-interface"> </div>
+            <div class="w-full border border-black bg-transparent rounded" id="connect-interface"> </div>
             </div>
 
             <!-- identity interface -->
-            <div class="flex flex-col border border-black rounded px-5 py-5">
+            <div class="flex flex-col justify-around border border-black rounded px-2 py-2">
                 <div class="text-center">I identify as:</div>
                 <div class="text-center font-bold" id="current-identity"></div>
-                <div class="h-6"></div>
-                <div class="flex justify-center">
+                <div class="h-4"></div>
+                <div class="flex justify-center pb-3">
                     <div id="select-identity"> </div>
                 </div>
-                <div class="flex justify-center border border-black rounded">
-                <input class="px-2" type="text" id="custom-identity" placeholder="custom" size="8" maxlength=20>
-                <div class="px-2 py-2">
-                    <button class="border border-black rounded px-2 py-2" id="set-identity">Set</button>
+                <div class="flex justify-between border border-black rounded">
+                <input class="px-2 py-1" type="text" id="custom-identity" placeholder="custom" size="8" maxlength=20>
+                <div class="px-2 py-1">
+                    <button class="border border-black rounded px-2 py-1" id="set-identity">Set</button>
                 </div>
                 </div>
+            </div>
+            <!-- nope -->
+            <div class="flex justify-center px-2 py-2">
+                <img class="w-42 border border-gray-400" alt="Nope" src="img/nope.png"> </a>
             </div>
 
 
@@ -66,22 +89,6 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
     </div>
 </div>
 
-<!-- chat input -->
-<div class=inputheight">
-    <!-- row -->
-    <div class="flex justify-start h-full">
-        <!-- chat typing -->
-        <div class="flex justify-around h-full w-full border border-black rounded px-1 py-1">
-        <textarea class="w-full h-full bg-gray-200" id="input-message" style="resize:none;" placeholder="type message..." maxlength=1000>
-        </textarea>
-        <div class="px-2 py-2 h-full">
-            <button class="border border-black rounded hover:bg-gray-200 h-full px-10 py-2 font-bold text-3xl" id="send-message">Send</button>
-        </div>
-        </div>
-
-
-    </div>
-</div>
 
 <!-- /body -->
 </div>

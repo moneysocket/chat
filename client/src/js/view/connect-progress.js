@@ -29,11 +29,11 @@ class ConnectProgress {
     }
 
     setConnectingTitle(div, title, color) {
-        var t = D.textSpan(div, title, "text-gray-300");
+        var t = D.textSpan(div, title, "text-gray-600 text-center");
     }
 
     setProgressLine(div, progress_string) {
-        var t = D.textSpan(div, progress_string, "");
+        var t = D.textSpan(div, progress_string, "text-center");
     }
 
     draw(state) {
@@ -91,7 +91,7 @@ class ConnectProgress {
 //          break;
         }
         D.deleteChildren(this.div);
-        var d = D.emptyDiv(this.div, "flex flex-col")
+        var d = D.emptyDiv(this.div, "flex flex-col justify-center")
         this.setConnectingTitle(d, title, color);
         this.setProgressLine(d, line);
     }
