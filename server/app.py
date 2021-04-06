@@ -178,10 +178,11 @@ class ChatApp(object):
         self.chat_db_file = config['Db']['ChatDbFile']
         self.chat_socket_server = None
         self.chat_db = None
-        self.pending = None
+        self.pending_requests = None
         self.consumer_stack = None
         self.consumer_connected = False
         self.price_msats = int(config['Server']['ChatMsatPrice'])
+        self.prune_loop = None
 
     ###########################################################################
 
@@ -279,7 +280,10 @@ class ChatApp(object):
         self.consumer_stack.do_connect(beacon)
 
         # TODO prune loop
+        self.prune_loop = LoopingCall(self.pending_requests.prune_expired)
+        self.prune_loop.start(60, now=False)
 
     def stop(self):
         self.consumer_stack.do_disconnect()
         self.chat_db.unmap_chat_bin()
+        self.prune_loop.stop()
