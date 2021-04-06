@@ -97,6 +97,8 @@ class ChatSocketClient(WebSocketServerProtocol):
     def onClose(self, wasClean, code, reason):
         logging.info("WebSocket connection closed: %s %s" % (reason,
                                                              self.client_uuid))
+        if self.client_uuid in self.server.clients:
+            del self.server.clients[self.client_uuid]
 
     def handle_message(self, msg_dict):
         cm = ChatMessage(msg_dict['username'], msg_dict['message'])
