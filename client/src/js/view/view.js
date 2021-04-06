@@ -68,7 +68,11 @@ class ChatView {
         this.select_identity = null;
         this.custom_identity = null;
         this.set_identity = null;
-        this.username = "Anonymous";
+
+        if (! this.hasStoredUsername()) {
+            this.storeUsername("Anonymous");
+        }
+        this.username = this.getStoredUsername();
 
         this.onchatinput = null;
         this.onbeaconselect = null;
@@ -229,10 +233,10 @@ class ChatView {
     drawConnectedInterface() {
         var div = document.getElementById("connect-interface");
         D.deleteChildren(div);
-        var flex = D.emptyDiv(div, "flex flex-col");
-        D.textParagraph(flex, "Wallet Connected", "text-green");
+        var flex = D.emptyDiv(div, "flex flex-col justify-center");
+        D.textParagraph(flex, "Wallet Connected", "text-center pb-1");
         this.wad_div = D.emptyDiv(flex, "");
-        var buttons = D.emptyDiv(flex, "flex justify-around py-4");
+        var buttons = D.emptyDiv(flex, "flex justify-around py-2");
         this.drawDisconnectButton(buttons,
             (function() {this.doDisconnect()}).bind(this));
     }
@@ -468,6 +472,7 @@ class ChatView {
         var username = username_string.replace(/\W/g, '')
         username = username.slice(0, 20);
         this.username = username;
+        this.storeUsername(this.username);
         var u = document.getElementById("current-identity");
         D.deleteChildren(u);
         D.textSpan(u, this.username);
@@ -513,11 +518,32 @@ class ChatView {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // identity persist
+    ///////////////////////////////////////////////////////////////////////////
+
+    hasStoredUsername() {
+        return window.localStorage.getItem("username") ? true : false;
+    }
+
+    getStoredUsername() {
+        return window.localStorage.getItem("username");
+    }
+
+    storeUsername(username) {
+        window.localStorage.setItem("username", username);
+    }
+
+    clearStoredUsername() {
+        window.localStorage.removeItem("username");
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
     // draw
     ///////////////////////////////////////////////////////////////////////////
 
     start() {
-        this.setUsername("Anonymous");
+        this.setUsername(this.getStoredUsername());
         this.setupChatInput();
         this.drawConnectInterface();
         this.setupIdentity();
