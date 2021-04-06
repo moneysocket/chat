@@ -32,16 +32,35 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
 
         <!-- side setup interfaces -->
         <div class="flex flex-col px-2">
+            <!-- introduction interface -->
             <div class="border border-black rounded">
-            <!-- description interface -->
             <div class="flex justify-center"><div class="px-2 py-2 w-60 text-center"> Each chat message costs 1 Satoshi to post. Payment can be automated by connecting a Moneysocket wallet. </div> </div>
             <!-- tutorial link interface -->
             <div class="px-2 pb-4 font-bold text-3xl text-green-700 text-center"> <a href="https://socket.money" target="_blank">Tutorial</a></div>
             </div>
+
             <!-- connect interface -->
             <div class="py-5">
             <div class="w-full border border-black bg-transparent rounded " id="connect-interface"> </div>
             </div>
+
+            <!-- identity interface -->
+            <div class="flex flex-col border border-black rounded px-5 py-5">
+                <div class="text-center">I identify as:</div>
+                <div class="text-center font-bold" id="current-identity"></div>
+                <div class="h-6"></div>
+                <div class="flex justify-center">
+                    <div id="select-identity"> </div>
+                </div>
+                <div class="flex justify-center border border-black rounded">
+                <input class="px-2" type="text" id="custom-identity" placeholder="custom" size="8" maxlength=20>
+                <div class="px-2 py-2">
+                    <button class="border border-black rounded px-2 py-2" id="set-identity">Set</button>
+                </div>
+                </div>
+            </div>
+
+
         </div>
 
     </div>
@@ -51,29 +70,15 @@ file LICENSE or http://www.opensource.org/licenses/mit-license.php -->
 <div class=inputheight">
     <!-- row -->
     <div class="flex justify-start h-full">
-        <!-- identity column -->
-        <div class="flex flex-col border border-black rounded h-full px-5 py-5">
-            <div class="text-center">I identify as:</div>
-            <div class="text-center font-bold" id="current-identity"></div>
-            <div class="h-6"></div>
-            <div class="flex justify-center">
-                <div id="select-identity"> </div>
-            </div>
-            <div class="flex justify-center border border-black rounded">
-            <input class="px-2" type="text" id="custom-identity" placeholder="custom" size="8" maxlength=20>
-            <div class="px-2 py-2">
-                <button class="border border-black rounded px-2 py-2" id="set-identity">Set</button>
-            </div>
-            </div>
-        </div>
         <!-- chat typing -->
         <div class="flex justify-around h-full w-full border border-black rounded px-1 py-1">
         <textarea class="w-full h-full bg-gray-200" id="input-message" style="resize:none;" placeholder="type message..." maxlength=1000>
         </textarea>
         <div class="px-2 py-2 h-full">
-            <button class="border border-black rounded hover:bg-gray-200 h-full px-2 py-2 font-bold text-3xl" id="send-message">Send</button>
+            <button class="border border-black rounded hover:bg-gray-200 h-full px-10 py-2 font-bold text-3xl" id="send-message">Send</button>
         </div>
         </div>
+
 
     </div>
 </div>
