@@ -46,6 +46,7 @@ const IDENTITY_PRESETS = ['- choose preset -',
                           'Pepe',
                           'Groyper',
                           'Shitcoin',
+                          'Satoshi',
                          ];
 
 
@@ -53,7 +54,7 @@ class ChatView {
     constructor(model) {
         this.model = model;
 
-        this.input_div = null;
+        this.textarea = null;
         this.paste_input_div = null;
         this.copy_span = null;
         this.wad_div = null;
@@ -73,6 +74,8 @@ class ChatView {
         this.onbeaconselect = null;
         this.ongenerateselect = null;
         this.ondisconnectselect = null;
+
+        this.messages = [];
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -272,40 +275,41 @@ class ChatView {
     }
 
 
-    drawChatInput() {
-        var input = document.getElementById("chat-input");
-        /*
-        var flex = D.emptyDiv(input, "flex flex-nowrap justify-start");
+    setupChatInput() {
+        var textarea = document.getElementById("input-message");
+        var send = document.getElementById("send-message");
 
-        var i = D.emptyDiv(flex, "border border-black break-all");
+        send.onclick = (function() {this.sendMessage()}).bind(this);
 
-        this.input_div = D.emptyInput(i,
-                                      "w-auto rounded border border-gray-800");
-
-        this.input_div.addEventListener("keyup", (function(event) {
-            if (event.keyCode === 13) {
+        textarea.addEventListener("keyup", (function(event) {
+            //console.log("event.altKey: " + event.altKey);
+            //console.log("keycode: " + event.keyCode);
+            if (event.altKey && event.keyCode === 13) {
+                this.textarea.value = this.textarea.value + "\n";
+            } else if (event.metaKey && event.keyCode === 13) {
+                this.textarea.value = this.textarea.value + "\n";
+            } else if (event.ctrlKey && event.keyCode === 13) {
+                this.textarea.value = this.textarea.value + "\n";
+            } else if (event.shiftKey && event.keyCode === 13) {
+                this.textarea.value = this.textarea.value + "\n";
+            } else if (event.keyCode === 13) {
                 this.sendMessage();
             }
         }).bind(this));
-
-        var b = D.button(i, (function() {
-                this.sendMessage();
-            }).bind(this),
-            "border border-black rounded px-2 py-2 bg-blue");
-        var flex = D.emptyDiv(b, "flex items-center justify-around");
-        var text = D.textSpan(flex, "send", "");
-        */
+        this.textarea = textarea;
+        this.textarea.value = "";
+        this.textarea.focus();
     }
 
 
     sendMessage() {
-        var msg = this.input_div.value;
-        if (msg == "") {
+        var msg = this.textarea.value.trim();
+        if (msg === "") {
             console.log("no message");
             return;
         }
         console.log("smessage: " + msg);
-        this.input_div.value = "";
+        this.textarea.value = "";
 
         if (this.onchatinput != null) {
             this.onchatinput(this.username, msg);
@@ -317,7 +321,8 @@ class ChatView {
             return;
         }
         D.deleteChildren(this.wad_div);
-        D.textParagraph(this.wad_div, wad.toString(), "font-bold");
+        D.textParagraph(this.wad_div, wad.toString(),
+                        "font-bold text-center text-2xl");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -356,8 +361,24 @@ class ChatView {
     }
 
     postMessage(timestamp, username, message, preimage) {
-        var m = document.getElementById("messages");
+        this.messages.push({'timestamp': timestamp,
+                            'username':  username,
+                            'message':   message});
+        this.drawMessage(timestamp, username, message, preimage);
+        if (preimage == null) {
+            return;
+        }
+        var payment_hash = Bolt11.preimageToPaymentHash(preimage);
+        var d = document.getElementById(payment_hash);
+        if (d == null) {
+            return;
+        }
+        D.deleteChildren(d);
+        this.scrollBottom(m);
+    }
 
+    drawMessage(timestamp, username, message, preimage) {
+        var m = document.getElementById("messages");
         var justify = (username == this.username) ? "justify-end" :
                                                    "justify-start";
         var bg_color = (username == this.username) ? "bg-blue-800" :
@@ -376,17 +397,17 @@ class ChatView {
         var right = D.emptyDiv(flex, "flex justify-end");
         D.textParagraph(right, t, "pr-4 text-sm text-white");
         this.scrollBottom(m);
+    }
 
-        if (preimage == null) {
-            return;
+    redrawMessages() {
+        var msgs = document.getElementById("messages");
+        D.deleteChildren(msgs);
+
+        for (var i = 0; i < this.messages.length; i++) {
+            var m = this.messages[i];
+            this.drawMessage(m['timestamp'], m['username'], m['message'],
+                             null);
         }
-        var payment_hash = Bolt11.preimageToPaymentHash(preimage);
-        var d = document.getElementById(payment_hash);
-        if (d == null) {
-            return;
-        }
-        D.deleteChildren(d);
-        this.scrollBottom(m);
     }
 
     drawBolt11Qr(div, bolt11) {
@@ -411,7 +432,7 @@ class ChatView {
         var payment_hash = Bolt11.getPaymentHash(bolt11);
         var m = document.getElementById("messages");
 
-        var jflex = D.emptyDiv(m, "flex justify-end");
+        var jflex = D.emptyDiv(m, "flex justify-end py-1");
         var bg = D.emptyDiv(jflex, "rounded-2xl bg-green-500 w-5/6");
         bg.setAttribute("id", payment_hash);
         var cflex = D.emptyDiv(bg, "flex flex-col")
@@ -419,7 +440,7 @@ class ChatView {
                                  "pl-4 text-l font-bold");
         var frow = D.emptyDiv(bg, "flex justify-around")
         var t = D.emptyDiv(frow, "flex flex-col w-60");
-        D.textParagraph(t, "It would be better if you had a Moneysocket wallet connected. You can pay manually, if you want, though:", "text-center");
+        D.textParagraph(t, "It would be better if you had a Moneysocket wallet connected. You can pay manually if you want, though.", "text-center");
         D.textParagraph(t, bolt11, "text-xs text-white break-words");
         this.drawBolt11Qr(frow, bolt11);
         this.scrollBottom(m);
@@ -450,6 +471,7 @@ class ChatView {
         var u = document.getElementById("current-identity");
         D.deleteChildren(u);
         D.textSpan(u, this.username);
+        this.redrawMessages();
         if (this.custom_identity == null) {
             return;
         }
@@ -475,7 +497,6 @@ class ChatView {
             return;
         }
         var selected = this.select_identity.value;
-        console.log("selected: " + selected);
         this.setUsername(selected);
     }
 
@@ -497,7 +518,7 @@ class ChatView {
 
     start() {
         this.setUsername("Anonymous");
-        this.drawChatInput();
+        this.setupChatInput();
         this.drawConnectInterface();
         this.setupIdentity();
     }
