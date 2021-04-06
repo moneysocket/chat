@@ -220,8 +220,7 @@ class ChatApp(object):
         return None
 
     def send_chat_history(self, client_uuid):
-        for m in self.chat_db.chat_messages():
-            print(m)
+        for m in self.chat_db.send_history():
             self.chat_socket_server.send_message(client_uuid, json.loads(m))
 
     ###########################################################################
