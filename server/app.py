@@ -28,6 +28,10 @@ from server.pending_requests import PendingRequests
 UNPAID_PRUNE_CHECK = 60
 UNPAID_PRUNE_SECONDS = 120
 
+
+MAX_USERNAME = 20
+MAX_MESSAGE = 1000
+
 ###############################################################################
 
 
@@ -47,13 +51,13 @@ class ChatMessage(dict):
     def is_valid(msg_dict):
         if 'username' not in msg_dict:
             return False
-        if len(msg_dict['username']) > 15:
+        if len(msg_dict['username']) > MAX_USERNAME:
             return False
         if not msg_dict['username'].isalnum():
             return False
         if 'message' not in msg_dict:
             return False
-        if len(msg_dict['message']) > 500:
+        if len(msg_dict['message']) > MAX_MESSAGE:
             return False
         return True
 
@@ -89,10 +93,6 @@ class ChatSocketClient(WebSocketServerProtocol):
 
         self.handle_message(msg_dict)
         logging.info("message: %s" % payload)
-        #self.server.app.chat_db.add_chat_message("tbd", "tbd", "tbd", "tbd",
-        #                                         "tbd", "tbd",
-        #                                         payload.decode('utf8'))
-        #self.server.echo_to_clients(payload)
 
     def onClose(self, wasClean, code, reason):
         logging.info("WebSocket connection closed: %s %s" % (reason,
