@@ -205,6 +205,9 @@ class ChatModel {
 
     consumerOnError(error_msg, request_reference_uuid) {
         console.log("error");
+        if (this.onconsumererror != null) {
+            this.onconsumererror(error_msg, request_reference_uuid);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -230,6 +233,7 @@ class ChatModel {
         var payment_hash = Bolt11.getPaymentHash(bolt11);
         this.pay_requests[payment_hash] = {'request_uuid': request_uuid,
                                            'bolt11':       bolt11};
+        return request_uuid;
     }
 
     consumerIsConnected() {

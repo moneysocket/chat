@@ -80,6 +80,8 @@ class ChatView {
         this.ondisconnectselect = null;
 
         this.messages = [];
+        this.pays_in_progress_by_hash = {};
+        this.pays_in_progress_by_uuid = {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -365,6 +367,7 @@ class ChatView {
     }
 
     postMessage(timestamp, username, message, preimage) {
+        console.log("post message: " + preimage);
         this.messages.push({'timestamp': timestamp,
                             'username':  username,
                             'message':   message});
@@ -374,11 +377,23 @@ class ChatView {
         }
         var payment_hash = Bolt11.preimageToPaymentHash(preimage);
         var d = document.getElementById(payment_hash);
-        if (d == null) {
-            return;
+        if (d != null) {
+            D.deleteChildren(d);
+            var m = document.getElementById("messages");
+            this.scrollBottom(m);
         }
-        D.deleteChildren(d);
-        this.scrollBottom(m);
+
+        if (payment_hash in this.pays_in_progress_by_hash) {
+            var request_uuid = this.pays_in_progress_by_hash[payment_hash];
+            delete this.pays_in_progress_by_uuid[request_uuid]
+            delete this.pays_in_progress_by_hash[payment_hash];
+            var d = document.getElementById(request_uuid);
+            if (d != null) {
+                D.deleteChildren(d);
+                var m = document.getElementById("messages");
+                this.scrollBottom(m);
+            }
+        }
     }
 
     drawMessage(timestamp, username, message, preimage) {
@@ -450,10 +465,42 @@ class ChatView {
         this.scrollBottom(m);
     }
 
-    postError(err_msg) {
+    postPayInProgress(request_uuid, bolt11) {
+        console.log("in progress------");
+        var m = document.getElementById("messages");
+        var jflex = D.emptyDiv(m, "flex justify-end py-1");
+        var bg = D.emptyDiv(jflex, "rounded-2xl bg-blue-400 w-5/6");
+        bg.setAttribute("id", request_uuid);
+        var cflex = D.emptyDiv(bg, "flex flex-col")
+        var un = D.textParagraph(cflex, "(only visible to you)",
+                                 "pl-4 text-l font-bold");
+        var t = D.emptyDiv(bg, "flex flex-col");
+        D.textParagraph(t, "Payment In Progress...", "text-center py-4");
+        this.scrollBottom(m);
+
+        var payment_hash = Bolt11.getPaymentHash(bolt11);
+        this.pays_in_progress_by_hash[payment_hash] = request_uuid;
+        this.pays_in_progress_by_uuid[request_uuid] = payment_hash;
+    }
+
+    postError(err_msg, request_reference_uuid) {
         var m = document.getElementById("messages");
         D.textParagraph(m, err_msg, "text-red-500");
         this.scrollBottom(m);
+
+        // delete element of in-progress payment
+        if (request_reference_uuid in this.pays_in_progress_by_uuid) {
+            var payment_hash = (
+                this.pays_in_progress_by_uuid[request_reference_uuid]);
+            delete this.pays_in_progress_by_uuid[request_reference_uuid]
+            delete this.pays_in_progress_by_hash[payment_hash];
+            var d = document.getElementById(request_reference_uuid);
+            if (d == null) {
+                return;
+            }
+            D.deleteChildren(d);
+            this.scrollBottom(m);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -48,8 +48,8 @@ class ChatController {
         this.model.onbalanceupdate = (function(wad) {
             this.view.postWadBalance(wad);
         }).bind(this);
-        this.model.onconsumererror = (function(error) {
-            this.view.postError(error);
+        this.model.onconsumererror = (function(error, request_reference_uuid) {
+            this.view.postError(error, request_reference_uuid);
         }).bind(this);
     }
 
@@ -72,7 +72,8 @@ class ChatController {
     onInvoice(bolt11) {
         if (this.model.consumerIsConnected()) {
             console.log("consumer is connected");
-            this.model.payInvoice(bolt11);
+            var request_uuid = this.model.payInvoice(bolt11);
+            this.view.postPayInProgress(request_uuid, bolt11);
             return;
         }
         console.log("consumer not connected");
