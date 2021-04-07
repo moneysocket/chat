@@ -13,6 +13,8 @@ BITS_PER_BYTE = 8
 WIDTH = 1024
 HEIGHT = 1024
 
+SEND_HISTORY_LEN = 200
+
 INIT_DATA = b'chat log:\0'
 
 class ChatDb(object):
@@ -93,14 +95,27 @@ class ChatDb(object):
         e = s.encode("utf-8") + b'\0'
         self.append_end(e)
 
-    def iter_chat_messages_json(self):
-        i = 0
-        while i < len(self.bin):
-            start = i
-            while i < len(self.bin) and self.bin[i] != 0:
-                i += 1
-            yield self.bin[start:i].decode("utf-8")
-            i += 1
+    def iter_send_history(self, length=None):
+        # This is a bit gross, but avoids holding too much in memory at a time
+        # For a long chat history, this won't have to read all of it, just
+        # the relevent newsest set of messages in the mmap.
+        i = len(self.bin) - 2
+        yielded = 0
+        while i >= 0:
+            end = i
+            while i >= 0 and self.bin[i] != 0:
+                i -= 1
+            if length and yielded >= length:
+                return
+            msg = self.bin[i+1:end+1].decode("utf-8")
+            if msg == "chat log:":
+                return
+            yield msg
+            yielded += 1
+            i -= 1
 
-    def chat_messages(self):
-        return list(self.iter_chat_messages_json())[1:]
+    def send_history(self):
+        l = list(self.iter_send_history(length=SEND_HISTORY_LEN))
+        l.reverse()
+        return l
+

@@ -7,5 +7,23 @@
 }
 
 .megashadow {
-    filter: drop-shadow(0.75rem 0.985rem 0.6rem rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0.75rem 0.985rem 0.6rem rgba(0, 0, 0, 0.2));
+}
+
+
+.bannerheight {
+    height: 13%;
+}
+.fillheight {
+    height: 2%;
+}
+.chatheight {
+    height: 85%;
+}
+
+.messageheight {
+    height: 80%;
+}
+.inputheight {
+    height: 20%;
 }

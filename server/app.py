@@ -28,6 +28,10 @@ from server.pending_requests import PendingRequests
 UNPAID_PRUNE_CHECK = 60
 UNPAID_PRUNE_SECONDS = 120
 
+
+MAX_USERNAME = 20
+MAX_MESSAGE = 1000
+
 ###############################################################################
 
 
@@ -47,13 +51,13 @@ class ChatMessage(dict):
     def is_valid(msg_dict):
         if 'username' not in msg_dict:
             return False
-        if len(msg_dict['username']) > 15:
+        if len(msg_dict['username']) > MAX_USERNAME:
             return False
         if not msg_dict['username'].isalnum():
             return False
         if 'message' not in msg_dict:
             return False
-        if len(msg_dict['message']) > 500:
+        if len(msg_dict['message']) > MAX_MESSAGE:
             return False
         return True
 
@@ -89,14 +93,12 @@ class ChatSocketClient(WebSocketServerProtocol):
 
         self.handle_message(msg_dict)
         logging.info("message: %s" % payload)
-        #self.server.app.chat_db.add_chat_message("tbd", "tbd", "tbd", "tbd",
-        #                                         "tbd", "tbd",
-        #                                         payload.decode('utf8'))
-        #self.server.echo_to_clients(payload)
 
     def onClose(self, wasClean, code, reason):
         logging.info("WebSocket connection closed: %s %s" % (reason,
                                                              self.client_uuid))
+        if self.client_uuid in self.server.clients:
+            del self.server.clients[self.client_uuid]
 
     def handle_message(self, msg_dict):
         cm = ChatMessage(msg_dict['username'], msg_dict['message'])
@@ -176,10 +178,11 @@ class ChatApp(object):
         self.chat_db_file = config['Db']['ChatDbFile']
         self.chat_socket_server = None
         self.chat_db = None
-        self.pending = None
+        self.pending_requests = None
         self.consumer_stack = None
         self.consumer_connected = False
         self.price_msats = int(config['Server']['ChatMsatPrice'])
+        self.prune_loop = None
 
     ###########################################################################
 
@@ -220,8 +223,7 @@ class ChatApp(object):
         return None
 
     def send_chat_history(self, client_uuid):
-        for m in self.chat_db.chat_messages():
-            print(m)
+        for m in self.chat_db.send_history():
             self.chat_socket_server.send_message(client_uuid, json.loads(m))
 
     ###########################################################################
@@ -278,7 +280,10 @@ class ChatApp(object):
         self.consumer_stack.do_connect(beacon)
 
         # TODO prune loop
+        self.prune_loop = LoopingCall(self.pending_requests.prune_expired)
+        self.prune_loop.start(60, now=False)
 
     def stop(self):
         self.consumer_stack.do_disconnect()
         self.chat_db.unmap_chat_bin()
+        self.prune_loop.stop()

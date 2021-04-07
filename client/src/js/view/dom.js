@@ -99,6 +99,24 @@ class DomUtl {
         div.appendChild(b);
         return b;
     }
+
+    static dropDownSelect(div, options, onchange_func, class_str) {
+        var s = document.createElement("select");
+        s.onchange = onchange_func;
+        if (class_str != null) {
+            DomUtl.setClass(s, class_str);
+        }
+        console.log("options: " + options);
+        for (var i = 0; i < options.length; i++) {
+            var o_str = options[i];
+            var o = document.createElement("option");
+            var t = document.createTextNode(o_str);
+            o.appendChild(t);
+            s.appendChild(o);
+        }
+        div.appendChild(s);
+        return s;
+    }
 }
 
 exports.DomUtl = DomUtl;

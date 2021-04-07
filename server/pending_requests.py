@@ -7,6 +7,9 @@ import time
 
 from moneysocket.utl.bolt11 import Bolt11
 
+MINUTE = 60
+HOUR = 60 * MINUTE
+
 class PendingRequests(object):
     def __init__(self):
         self.invoicing = {}
@@ -39,3 +42,17 @@ class PendingRequests(object):
         request['message']['preimage'] = preimage
         request['message']['paid_timestamp'] = time.time()
         return request['message'], None
+
+    def prune_expired(self):
+        expired = []
+        for payment_hash, request in self.invoiced.items():
+            bolt11 = request['message']['bolt11']
+            d = Bolt11.to_dict(bolt11)
+            # prune everything after an hour - moneysocket doesn't yet allow
+            # us to invoice with a shorter expiry time. TODO - fix this
+            if time.time() > (d['created_at'] + HOUR):
+                expired.append(payment_hash)
+            logging.info("pruning: %s" % bolt11)
+
+        for payment_hash in expired:
+            del self.invoiced[payment_hash]

@@ -13,6 +13,7 @@ class ChatSocket {
         this.onmessage = null;
         this.onmessages = null;
         this.onerror = null;
+        this.onservererror = null;
 
         this.ws = new WebSocket(this.url);
         this.ws.onmessage = (function(event) {
@@ -28,9 +29,9 @@ class ChatSocket {
                 this.ondisconnect();
             }
         }).bind(this);
-        this.ws.onerror = (function(error) {
+        this.ws.onerror = (function(event) {
             if (this.onerror != null) {
-                this.onerror(error);
+                this.onerror(event);
             }
         }).bind(this);
         console.log("connected");
@@ -38,7 +39,6 @@ class ChatSocket {
 
     onMessage(event) {
         var msg = JSON.parse(event.data);
-        console.log("got msg off wire: " + event.data);
 
         if (msg['type'] == "MESSAGE") {
             if (this.onmessage != null) {
@@ -51,8 +51,8 @@ class ChatSocket {
             }
         }
         if (msg['type'] == "ERROR") {
-            if (this.onerror != null) {
-                this.onerror(msg['error']);
+            if (this.onservererror != null) {
+                this.onservererror(msg['error']);
             }
         }
     }
