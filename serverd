@@ -2,14 +2,23 @@
 # Copyright (c) 2021 Moneysocket Developers
 # Distributed under the MIT software license, see the accompanying
 # file LICENSE or http://www.opensource.org/licenses/mit-license.php
+import datetime
+import os
+import logging
 
 from twisted.internet import reactor
 
 from server.config import read_config
 from server.app import ChatApp
+from server.log_setup import setup_logging
 
 if __name__ == "__main__":
     config = read_config()
+
+    now = datetime.datetime.now().strftime("%y%m%d-%H.%M.%S")
+    logfile = os.path.join(config['Server']['LogDir'], "chatd-%s.log" % now)
+    setup_logging(logfile, "chatd", min_level=logging.INFO)
+
     a = ChatApp(config)
     a.run()
     reactor.addSystemEventTrigger("before", "shutdown", a.stop)
