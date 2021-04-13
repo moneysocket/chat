@@ -268,20 +268,32 @@ class ChatApp(object):
 
     ###########################################################################
 
-    def run(self):
-        self.setup_chatsocket_server()
-        self.setup_chat_db()
-        self.setup_consumer_stack()
-        self.setup_pending_requests()
+    def connect(self):
         beacon, err = MoneysocketBeacon.from_bech32_str(
             self.config['WalletProvider']['Beacon'])
         if err:
             sys.exit("bad beacon? %s" % err)
         self.consumer_stack.do_connect(beacon)
 
-        # TODO prune loop
+    def reconnect(self):
+        if self.consumer_connected:
+            return
+        self.connect()
+
+    ###########################################################################
+
+    def run(self):
+        self.setup_chatsocket_server()
+        self.setup_chat_db()
+        self.setup_consumer_stack()
+        self.setup_pending_requests()
+
+        self.connect()
         self.prune_loop = LoopingCall(self.pending_requests.prune_expired)
         self.prune_loop.start(60, now=False)
+
+        self.reconnect_loop = LoopingCall(self.reconnect)
+        self.reconnect_loop.start(5, now=False)
 
     def stop(self):
         self.consumer_stack.do_disconnect()
