@@ -180,7 +180,8 @@ class ChatApp(object):
         self.chat_db = None
         self.pending_requests = None
         self.consumer_stack = None
-        self.consumer_connected = False
+        self.consumer_announced = False
+        self.consumer_connecting = None
         self.price_msats = int(config['Server']['ChatMsatPrice'])
         self.prune_loop = None
 
@@ -210,7 +211,7 @@ class ChatApp(object):
     ###########################################################################
 
     def client_message_request(self, client_uuid, chat_message):
-        if not self.consumer_connected:
+        if not self.consumer_announced:
             return "chat server invoice failure"
 
         request_uuid, err = self.consumer_stack.request_invoice(
@@ -229,12 +230,12 @@ class ChatApp(object):
     ###########################################################################
 
     def consumer_on_announce(self, nexus):
-        self.consumer_connected = True
+        self.consumer_announced = True
         self.consumer_nexus_uuid = nexus.uuid
         print("consumer online")
 
     def consumer_on_revoke(self, nexus):
-        self.consumer_connected = False
+        self.consumer_announced = False
         self.consumer_nexus_uuid = None
         print("consumer offline")
 
@@ -273,10 +274,10 @@ class ChatApp(object):
             self.config['WalletProvider']['Beacon'])
         if err:
             sys.exit("bad beacon? %s" % err)
-        self.consumer_stack.do_connect(beacon)
+        self.consumer_connecting = self.consumer_stack.do_connect(beacon)
 
     def reconnect(self):
-        if self.consumer_connected:
+        if self.consumer_connecting.get_state() in {'connecting', 'connected'}:
             return
         self.connect()
 
