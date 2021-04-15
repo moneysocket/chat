@@ -11,6 +11,7 @@ var log = require('gulplog');
 var babel = require('gulp-babel');
 var concat = require('gulp-concat');
 var clean = require('gulp-clean');
+var replace = require('gulp-replace');
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,7 +47,7 @@ gulp.task('imageMin', function imageMin(cb) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-gulp.task('appQuick', function () {
+gulp.task('appDev', function () {
     var b = browserify({
       entries: './src/js/app.js',
       debug: true
@@ -60,17 +61,38 @@ gulp.task('appQuick', function () {
       .pipe(gulp.dest('./htdocs/js/'));
 });
 
-gulp.task('quick', gulp.series(['clean',
+gulp.task('appProd', function () {
+    var b = browserify({
+      entries: './src/js/app.js',
+      debug: true
+    });
+
+    return b.bundle()
+      .pipe(source('./app.js'))
+      .pipe(replace("ws://localhost:4343", "wss://chat.socket.money"))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest('./htdocs/js/'));
+});
+
+gulp.task('dev', gulp.series(['clean',
                                'copyMisc',
                                'copyHtml',
-                               'appQuick',
+                               'appDev',
                                ]));
 
-gulp.task('quick_watch', function () {
+gulp.task('dev_watch', function () {
     gulp.watch("src/**/*" , { ignoreInitial: false },
                gulp.series(['clean',
                             'copyMisc',
                             'copyHtml',
-                            'appQuick',
+                            'appDev',
                             ]));
 });
+
+gulp.task('prod', gulp.series(['clean',
+                               'copyMisc',
+                               'copyHtml',
+                               'appProd',
+                               ]));
